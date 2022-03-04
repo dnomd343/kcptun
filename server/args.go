@@ -3,10 +3,16 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"os"
 	"sort"
 	"strings"
 )
+
+func isIPv6(str string) bool {
+	ip := net.ParseIP(str)
+	return ip != nil && strings.Contains(str, ":")
+}
 
 // Key–value mappings for the representation of client and server options.
 
@@ -75,6 +81,12 @@ func parseEnv() (opts Args, err error) {
 	}
 	if len(ss_local_host) == 0 {
 		return
+	}
+	if isIPv6(ss_remote_host) {
+	    ss_remote_host = "[" + ss_remote_host + "]"
+	}
+	if isIPv6(ss_local_host) {
+	    ss_local_host = "[" + ss_local_host + "]"
 	}
 	opts.Add("listen", ss_remote_host+":"+ss_remote_port)
 	opts.Add("target", ss_local_host+":"+ss_local_port)
